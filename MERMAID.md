@@ -131,52 +131,7 @@ flowchart LR
 ```
 > Nothing is ever silently wrong: drift lowers confidence → forces a fresh proposal → human re-certifies. Today the loop serves **READ** context to AI; governed write-back Actions are deferred.
 
-## 4 · Build status ("you are here")
-
-```mermaid
-flowchart TB
-  subgraph legend["Legend"]
-    direction LR
-    l1["Built & gated"]:::done
-    l2["In progress now"]:::prog
-    l3["Partial / early"]:::early
-    l4["Not started"]:::none
-    l5["Deferred by design"]:::deferred
-  end
-  subgraph f["1 · Data-engineering foundation"]
-    connect["Connect to sources<br/>(DBs + files solid; API/SaaS/NoSQL not yet)"]:::early
-    discover["Discover & profile"]:::done
-    build["Build & move data"]:::done
-    operate["Run & operate"]:::done
-  end
-  subgraph t["2 · Trust & observability"]
-    lineage["Lineage<br/>(column-level partial)"]:::early
-    quality["Data quality"]:::done
-    alerts["Alerts & incidents"]:::done
-    govern["Govern & promote"]:::done
-  end
-  subgraph i["3 · Intelligence — the wedge"]
-    ontology["Semantic model / ontology<br/>Objects · Properties · Links · evidence-weighted"]:::done
-    brainc["Company brain / context layer<br/>Context packet · confidence · serve-to-AI"]:::prog
-    agent["AI agent<br/>build · operate · self-heal"]:::done
-    actions["Ontology Actions / write-backs<br/>(deferred by choice)"]:::deferred
-    servea["Serve / conversational analytics<br/>(designed, gated on GenUI)"]:::none
-  end
-  subgraph r["4 · Runtime & infrastructure"]
-    secure["Secure-agent runtime"]:::done
-    genui["Generative UI surfaces"]:::early
-    llm["Multi-provider LLM seam"]:::done
-    compute["Vectorized compute engine"]:::none
-  end
-
-  classDef done fill:#2e7d32,stroke:#1b5e20,color:#fff;
-  classDef prog fill:#1168bd,stroke:#0b4884,color:#fff;
-  classDef early fill:#e8a33d,stroke:#b97e22,color:#2b2b2b;
-  classDef none fill:#d9dde2,stroke:#aab2bd,color:#2b2b2b;
-  classDef deferred fill:#eef1f4,stroke:#aab2bd,stroke-dasharray:4 4,color:#5f6b78;
-```
-
-## 5 · datadex architecture — current state
+## 4 · datadex architecture — current state
 
 ```mermaid
 flowchart TB
@@ -214,7 +169,7 @@ flowchart TB
 ```
 > Reads top-to-bottom: platform earns evidence → evidence builds the model → model becomes the brain → **AI reads grounded context**. The control plane sees only metadata. *(Governed write-back Actions are deferred.)*
 
-## 6 · Deployment topology (data residency)
+## 5 · Deployment topology (data residency)
 
 ```mermaid
 flowchart TB
@@ -255,7 +210,7 @@ flowchart TB
 ```
 > **Bulk client data never leaves your environment** — only the secure agent reads it. The agent reaches **out** to the control plane (HTTPS outbound; no inbound holes in your firewall). The control plane holds metadata + encrypted secrets; the LLM sees prompts only.
 
-## 7 · Semantic-model shape (the brain, made concrete)
+## 6 · Semantic-model shape (the brain, made concrete)
 
 ```mermaid
 flowchart LR
@@ -276,7 +231,7 @@ flowchart LR
 ```
 > **Objects** (business entities) carry certified **Properties**; **Links** are certified and confidence-scored (governed traversal, ADR 0006/0024). The whole model is *earned* from evidence, not hand-declared. Ontology **Actions / write-backs** (e.g. AdjudicateClaim) are **deferred**. *(confidence numbers illustrative)*
 
-## 8 · Context-packet anatomy ("perfect context for AI")
+## 7 · Context-packet anatomy ("perfect context for AI")
 
 ```mermaid
 flowchart LR
@@ -312,9 +267,9 @@ flowchart LR
 > **Proposed, NOT built.** Derived from 2026-06-24 market research (`/last30days` + web; see [ADR 0029](../adr/0029-the-target-state-context-layer-is-hybrid-retrieval-plus-cited-answers-read-only.md)). The market converged on datadex's exact category ("active ontology" + "context layer"); these diagrams show the four read-side gaps to become best-in-class.
 > **Purple = net-new in the target state.** Scope unchanged: read-only (ontology Actions / write-backs stay deferred). Wedge to keep legible on every frame: **evidence-built + human-certified + agent-only**.
 
-### 9 · Retrieval architecture — current vs proposed
+### 8 · Retrieval architecture — current vs proposed
 
-**9a — current (graph-only)**
+**8a — current (graph-only)**
 
 ```mermaid
 flowchart TB
@@ -336,7 +291,7 @@ flowchart TB
   style surface fill:#eef4fb,stroke:#0b4884,color:#0b4884
 ```
 
-**9b — proposed (hybrid retrieval + cited answer)**
+**8b — proposed (hybrid retrieval + cited answer)**
 
 ```mermaid
 flowchart TB
@@ -372,9 +327,9 @@ flowchart TB
   style retr fill:#f3eefb,stroke:#6a4c93,color:#6a4c93
 ```
 
-### 10 · Context packet — current vs proposed
+### 9 · Context packet — current vs proposed
 
-**10a — current**
+**9a — current**
 
 ```mermaid
 flowchart LR
@@ -397,7 +352,7 @@ flowchart LR
   style packet fill:#eef4fb,stroke:#0b4884,color:#0b4884
 ```
 
-**10b — proposed (context packet++)**
+**9b — proposed (context packet++)**
 
 ```mermaid
 flowchart LR
@@ -433,9 +388,9 @@ flowchart LR
 > The **current** halves below are verified against the running code (file refs inline), not the pitch deck. The **proposed** halves are derived from 2026 market research — agent zero-trust / fine-grained authz, the "active ontology + context layer" category, and self-healing-pipeline patterns. **Purple = net-new in the target state.** The wedge stays legible on every frame: **evidence-built + human-certified + agent-only**, and the human-only governance gates stay human-only even as autonomy grows.
 > Sources: [Cerbos — MCP & zero-trust](https://www.cerbos.dev/blog/mcp-and-zero-trust-securing-ai-agents-with-identity-and-policy) · [Zero-Trust Identity for Agentic AI (arXiv 2505.19301)](https://arxiv.org/html/2505.19301v2) · [Atlan — Active Ontology, the 2026 default](https://atlan.com/know/what-is-active-ontology/) · [Ontologies, Context Graphs & Semantic Layers](https://contextandchaos.substack.com/p/ontologies-context-graphs-and-semantic) · [Self-healing data pipelines (6-agent pattern)](https://medium.com/codetodeploy/agentic-data-infrastructure-i-built-a-self-healing-data-pipeline-system-8eb87f16f30e).
 
-### 11 · Trust & security model — current vs proposed
+### 10 · Trust & security model — current vs proposed
 
-**11a — current (code-verified)**
+**10a — current (code-verified)**
 
 ```mermaid
 flowchart TB
@@ -475,7 +430,7 @@ flowchart TB
 ```
 > The trust story in one read: **bulk data never leaves the customer env** (only the secure agent touches it, reaching *out* over HTTPS — no inbound holes); the **control plane is metadata-only**; secrets are **encrypted write-only**; and the two grants that admit logic to production (`promotions:approve`, `production:write_direct`) are **human-only by construction** — stripped from every service account, so no agent or API key can cross them (`store_primitives.py` · `secrets.py` · `store_mixins/agents.py`).
 
-**11b — proposed (agentic zero-trust target state)**
+**10b — proposed (agentic zero-trust target state)**
 
 ```mermaid
 flowchart TB
@@ -508,9 +463,9 @@ flowchart TB
 ```
 > Where the market is going (Cerbos / Microsoft Entra Agent ID / arXiv 2505.19301): coarse role-strings give way to a **policy decision point** that authorizes the *parameters* of a tool call, **short-lived job-scoped credentials** replace the long-lived bearer token, agents get a **first-class identity with subject↔actor delegation provenance**, and **behavioral monitoring** (the agent-trace scorer is the seed) revokes a misbehaving session. Note what does **not** change: outbound-only data path, metadata-only control plane, and the human-only production gates.
 
-### 12 · Where datadex sits — competitive map + the wedge
+### 11 · Where datadex sits — competitive map + the wedge
 
-**12a — the 2026 landscape (positioning)**
+**11a — the 2026 landscape (positioning)**
 
 ```mermaid
 quadrantChart
@@ -531,7 +486,7 @@ quadrantChart
 ```
 > The prize quadrant is **top-right: an active ontology that serves agents AND is built automatically.** Palantir owns the agent-ontology idea but builds it by hand (forward-deployed engineers — doesn't scale to a normal data team); Atlan/Collibra automate but stay catalog-first; dbt/Cube standardise *metrics*, not entity *meaning*. datadex is the only one earning the model from evidence while keeping it agent-first.
 
-**12b — the wedge (why datadex wins its corner)**
+**11b — the wedge (why datadex wins its corner)**
 
 ```mermaid
 flowchart TB
@@ -562,9 +517,9 @@ flowchart TB
 ```
 > No single competitor is doing all three at once. Each leg alone is matchable; **the combination is the moat** — and OSI gives us a standards-based on-ramp (conform at the boundary) instead of a lock-in fight. (Atlan publicly reports up to 5× AI-analyst accuracy from a context layer — the category's value is already market-proven.)
 
-### 13 · The agent's build → operate → self-heal loop — current vs proposed
+### 12 · The agent's build → operate → self-heal loop — current vs proposed
 
-**13a — current (code-verified)**
+**12a — current (code-verified)**
 
 ```mermaid
 flowchart LR
@@ -593,7 +548,7 @@ flowchart LR
 ```
 > The agent already does the hard part most "AI data engineer" demos skip: when a gold run fails because silver wrote 0 rows because bronze broke, it walks the lineage DAG to the **earliest** broken producer and proposes the fix *there*, not at the symptom — then stops. `propose_remediation` carries an **`auto = False` invariant**: it presents "here's the fix I propose — approve it," it never self-applies (`codegen.py: diagnose_upstream_root_cause` + `propose_remediation`).
 
-**13b — proposed (self-healing target state, wedge intact)**
+**12b — proposed (self-healing target state, wedge intact)**
 
 ```mermaid
 flowchart TB
@@ -620,11 +575,11 @@ flowchart TB
 ```
 > The market's best self-healing systems add four things datadex is well-placed for: a **proactive monitor** (catch freshness/row-count drift, not only run failures), a **deterministic blast-radius gate** (we already have lineage + impact), a **verify-after-fix loop**, and **MTTR / %-auto metrics**. The one genuinely new policy is a **narrow autonomous zone** — and datadex takes it on-brand: a fix may self-apply *only* after a human has **certified that recurring pattern once** (recurrence-gated, the same DIAL-KG mechanism behind evidence-driven links). That keeps the documented stance — *governed proposals, no ungoverned background autonomy* — while still earning the MTTR wins. Human-only production gates never become machine-eligible.
 
-### 14 · Pipeline DAG execution — how a pipeline actually runs (current, code-verified)
+### 13 · Pipeline DAG execution — how a pipeline actually runs (current, code-verified)
 
 > Grounded in `routes/execution.py`. A pipeline is a **DAG of Tasks** (nodes) joined by **edges** (`from_task_id → to_task_id`). Execution is **control-plane orchestrated, agent-executed**: the control plane decides *what is ready*, the secure agent (the only tier that touches client data) *does the work*. Nothing here is aspirational — these are the real functions.
 
-**14a — DAG structure & dependency-gated advance**
+**13a — DAG structure & dependency-gated advance**
 
 ```mermaid
 flowchart TB
@@ -656,7 +611,7 @@ flowchart TB
 ```
 > Roots start first; `member_join` waits for **both** `claims_ingest` and `members_ingest`; `claims_gold` waits for both of its parents. If a Task **fails**, the per-failure policy decides the blast: **`skip_downstream`** (default) BFS-cancels only that Task's not-yet-started descendants — independent branches keep running; **`halt`** cancels every un-started Task in the run; **`continue`** cancels nothing. A *running* Task is never force-cancelled — it's left to finish. A failing **critical DQ check** fails the run (and cascades as a failure); a warning is advisory.
 
-**14b — one Task-run's lifecycle (through the secure agent)**
+**13b — one Task-run's lifecycle (through the secure agent)**
 
 ```mermaid
 flowchart LR

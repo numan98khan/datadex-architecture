@@ -28,19 +28,18 @@ A brand palette + a cheatsheet (so you can author new diagrams in the same style
 | 1 | Where we sit | datadex sits *on top of* Informatica/Databricks/Snowflake — it doesn't replace them |
 | 2 | How it works | The value spine: connect → observe → propose → **human certify** → brain → reason |
 | 3 | The living loop | The drift answer: drift → confidence drops → re-propose → re-certify |
-| 4 | Build status | "You are here" — built vs in-progress vs deferred |
-| 5 | Architecture (current) | Control plane (metadata-only) over the data plane (secure agent) |
-| 6 | Deployment topology | Data residency — bulk data never leaves the customer environment |
-| 7 | Semantic-model shape | The ontology made concrete (Claim · Member · Provider) |
-| 8 | Context-packet anatomy | What "perfect context for AI" concretely contains |
+| 4 | Architecture (current) | Control plane (metadata-only) over the data plane (secure agent) |
+| 5 | Deployment topology | Data residency — bulk data never leaves the customer environment |
+| 6 | Semantic-model shape | The ontology made concrete (Claim · Member · Provider) |
+| 7 | Context-packet anatomy | What "perfect context for AI" concretely contains |
 | **Target state (proposed)** | | |
-| 9 | Retrieval architecture | Current graph-only vs proposed hybrid retrieval + cited answers |
-| 10 | Context packet | Current vs an enriched, point-in-time, cited packet |
+| 8 | Retrieval architecture | Current graph-only vs proposed hybrid retrieval + cited answers |
+| 9 | Context packet | Current vs an enriched, point-in-time, cited packet |
 | **Deep dives (code-verified current · researched target)** | | |
-| 11 | Trust & security model | Outbound-only agent, metadata-only plane, human-only production gates; zero-trust target |
-| 12 | Competitive map + the wedge | Where datadex sits vs Palantir / Atlan / dbt / warehouse-native AI |
-| 13 | Agent build → operate → self-heal | Lineage root-cause + governed remediation; self-healing target |
-| 14 | Pipeline DAG execution | How a pipeline actually runs — DAG gating + per-task run lifecycle |
+| 10 | Trust & security model | Outbound-only agent, metadata-only plane, human-only production gates; zero-trust target |
+| 11 | Competitive map + the wedge | Where datadex sits vs Palantir / Atlan / dbt / warehouse-native AI |
+| 12 | Agent build → operate → self-heal | Lineage root-cause + governed remediation; self-healing target |
+| 13 | Pipeline DAG execution | How a pipeline actually runs — DAG gating + per-task run lifecycle |
 
 > The **current** diagrams are verified against the running code; the **proposed** halves
 > (purple) are derived from 2026 market research and are clearly marked as not-yet-built.
@@ -49,4 +48,4 @@ A brand palette + a cheatsheet (so you can author new diagrams in the same style
 
 - **GitHub** renders every block automatically — no build step, nothing to install.
 - Mermaid reserves a few words (`graph`, `end`, `class`, `subgraph`, `style`); avoid them
-  as node IDs. Diagram 12a uses Mermaid's `quadrantChart`; the rest are `flowchart`.
+  as node IDs. Diagram 11a uses Mermaid's `quadrantChart`; the rest are `flowchart`.
