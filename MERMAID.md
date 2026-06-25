@@ -516,6 +516,8 @@ flowchart TB
   style wedge fill:#eef9ef,stroke:#1b5e20,color:#1b5e20
 ```
 > No single competitor is doing all three at once. Each leg alone is matchable; **the combination is the moat** — and OSI gives us a standards-based on-ramp (conform at the boundary) instead of a lock-in fight. (Atlan publicly reports up to 5× AI-analyst accuracy from a context layer — the category's value is already market-proven.)
+>
+> **→ Full competitive deep dive** (5-camp map, capability matrix, per-competitor breakdown, honest gaps, cross-question bank): [`COMPETITIVE.md`](./COMPETITIVE.md).
 
 ### 12 · The agent's build → operate → self-heal loop — current vs proposed
 

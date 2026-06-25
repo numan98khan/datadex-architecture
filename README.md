@@ -9,6 +9,10 @@ perfect **read** context to reason over your business.
 To produce a polished visual, paste any block into an AI / code-rendering tool
 (Claude, ChatGPT, Eraser, Napkin, Excalidraw, [mermaid.live](https://mermaid.live)).
 
+**Competitive deep dive: [`COMPETITIVE.md`](./COMPETITIVE.md)** — how datadex sits vs Palantir,
+Atlan, Snowflake/Databricks, dbt, Illumex and Glean (5-camp map, capability matrix, per-competitor
+breakdown, honest gaps, and a cross-question bank).
+
 ## Scope
 
 datadex's current scope is **(1) auto-build a good evidence-driven ontology**
