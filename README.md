@@ -13,6 +13,10 @@ To produce a polished visual, paste any block into an AI / code-rendering tool
 Atlan, Snowflake/Databricks, dbt, Illumex and Glean (5-camp map, capability matrix, per-competitor
 breakdown, honest gaps, and a cross-question bank).
 
+**Personas & user flows: [`USER-FLOWS.md`](./USER-FLOWS.md)** — who interacts with the platform and
+how (current state, code-verified) plus the proposed hybrid target state where business-user demand
+meets the bottom-up evidence engine.
+
 ## Scope
 
 datadex's current scope is **(1) auto-build a good evidence-driven ontology**
