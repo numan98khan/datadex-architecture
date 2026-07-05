@@ -24,12 +24,20 @@ datadex's current scope is **(1) auto-build a good evidence-driven ontology**
 packet). Ontology **Actions / write-backs are deferred** — the AI reads and reasons, it
 does not yet write back to client systems. Every diagram reflects this read-only scope.
 
+**Landed since these diagrams were first drawn (as of 2026-07-05):** `context.answer` cited
+synthesis is now live (the `ontology.answer` MCP tool); the ontology gained **brownfield
+in-place adoption**, **the Measure** (governed aggregates), and **definition versioning** (a
+content-addressed ledger); the LLM is a pluggable seam (OpenAI · Gemini · Groq/gpt-oss ·
+DeepSeek · self-hosted); and the whole platform now **ships self-hosted as "Ontos"** —
+hardened, cosign-signed, license-gated images the customer runs **air-gapped**. New connector:
+**BigQuery**. The MCP surface is **102 governed tools**. Scope is unchanged (Actions deferred).
+
 The legible wedge on every frame: **evidence-built + human-certified + agent-only.**
 
 ## What's inside `MERMAID.md`
 
 A brand palette + a cheatsheet (so you can author new diagrams in the same style), then
-16 diagrams in four groups:
+13 numbered diagrams (several with current-vs-proposed halves) in four groups:
 
 | # | Diagram | What it shows |
 |---|---------|---------------|
@@ -37,9 +45,9 @@ A brand palette + a cheatsheet (so you can author new diagrams in the same style
 | 2 | How it works | The value spine: connect → observe → propose → **human certify** → brain → reason |
 | 3 | The living loop | The drift answer: drift → confidence drops → re-propose → re-certify |
 | 4 | Architecture (current) | Control plane (metadata-only) over the data plane (secure agent) |
-| 5 | Deployment topology | Data residency — bulk data never leaves the customer environment |
-| 6 | Semantic-model shape | The ontology made concrete (Claim · Member · Provider) |
-| 7 | Context-packet anatomy | What "perfect context for AI" concretely contains |
+| 5 | Deployment topology | **5a hosted (SaaS)** · **5b self-hosted "Ontos"** — the whole platform air-gapped inside your network |
+| 6 | Semantic-model shape | The ontology made concrete (Claim · Member · Provider) + the Measure, brownfield adoption & the versioning ledger |
+| 7 | Context-packet anatomy | What "perfect context for AI" concretely contains — now served as cited answers (`ontology.answer`) |
 | **Target state (proposed)** | | |
 | 8 | Retrieval architecture | Current graph-only vs proposed hybrid retrieval + cited answers |
 | 9 | Context packet | Current vs an enriched, point-in-time, cited packet |

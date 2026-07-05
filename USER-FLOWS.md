@@ -1,10 +1,14 @@
-# datadex — personas & user flows (2026-06-25)
+# datadex — personas & user flows (2026-06-25 · updated 2026-07-05)
 
 High-level view of **who interacts with datadex and how**. The **current state** is code-verified
 (it reflects the platform as it runs today). The **target state** is *proposed* — it shows the
 **hybrid flow** where the bottom-up evidence engine meets the demand-side questions a business user
 actually has (purple = net-new). Scope is unchanged: **read-only, evidence-built, human-certified,
 agent-only**; the AI reasons and answers, it does not write back.
+
+> **Since 2026-06-25:** the answer *mechanism* the target state is built around — `context.answer`,
+> cited and ground-or-abstain — has **landed** as the live `ontology.answer` MCP tool. What stays
+> *proposed* is the **hybrid demand-side flow** that makes the Business Analyst a first-class persona.
 
 ---
 
@@ -42,7 +46,7 @@ flowchart TB
     direction TB
     web["Web console"]:::container
     chat["AI chat (in-app)"]:::container
-    mcp["MCP gateway · 88 tools"]:::container
+    mcp["MCP gateway · 102 tools"]:::container
   end
   plat["datadex platform + ontology + context layer"]:::ok
   de --> web
@@ -106,7 +110,7 @@ and reinforce confidence. Three guardrails keep it on-thesis.
 flowchart TB
   ba["Business Analyst / Decision-maker<br/>now first-class"]:::proposed
   ba -->|"1 · states the questions / decisions they need<br/>(lightweight capture — NOT a requirements workshop)"| cov["2 · Coverage check<br/>match questions vs the evidence-built model"]:::proposed
-  cov -->|"✅ answerable now"| ans["4 · context.answer<br/>CITED, point-in-time (read-only)"]:::proposed
+  cov -->|"✅ answerable now"| ans["4 · context.answer — BUILT (ontology.answer)<br/>CITED, ground-or-abstain (read-only)"]:::container
   cov -->|"◐ close — links exist but uncertified"| backlog["3 · demand-ranked certify backlog"]:::proposed
   cov -->|"➖ genuine evidence gap"| gap["report the gap honestly<br/>(never fabricate — EVIDENCE GATES)"]:::proposed
   backlog --> ds["Data Steward<br/>certifies what the questions need FIRST"]:::person
@@ -154,7 +158,7 @@ sequenceDiagram
 
 1. **Evidence still gates.** Demand prioritises and validates coverage; it **never fabricates** an entity with no backing data. Stays true to *"an Object is earned, not asserted."*
 2. **Human still certifies.** Questions rank the backlog; a steward still approves what goes live. The human-only production gates are unchanged.
-3. **Read-only, still.** The flow stops at a **cited answer**, not an action/write-back. Answering is the serve layer ([ADR 0029](../adr/0029-the-target-state-context-layer-is-hybrid-retrieval-plus-cited-answers-read-only.md) `context.answer`); ontology Actions stay deferred.
+3. **Read-only, still.** The flow stops at a **cited answer**, not an action/write-back. Answering is the serve layer ([ADR 0029](../adr/0029-the-target-state-context-layer-is-hybrid-retrieval-plus-cited-answers-read-only.md) `context.answer`, now **built** as `ontology.answer`); ontology Actions stay deferred.
 
 ---
 
@@ -164,7 +168,7 @@ sequenceDiagram
 |---|---|---|
 | **Data Engineer** | Builds & operates pipelines | Unchanged — still the builder |
 | **Data Steward** | Certifies the whole proposed model | Certifies **demand-ranked** first — effort aimed at what the business actually asks |
-| **AI Agent** | Reads context, reasons | Also delivers **cited** answers (`context.answer`) |
+| **AI Agent** | Reads context, reasons; delivers **cited** answers (`ontology.answer`, now built) | Same, but questions also steer the certify backlog |
 | **Business Analyst** | Downstream, secondhand insight | **First-class**: asks questions → gets coverage feedback + cited answers; their questions steer the model |
 | **Viewer** | Read-only views | Unchanged |
 

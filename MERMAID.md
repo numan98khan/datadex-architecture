@@ -9,7 +9,7 @@ Napkin, Excalidraw, GitHub, Notion, mermaid.live) to get a visual.
 
 ---
 
-## Scope today (decided 2026-06-24)
+## Scope today (decided 2026-06-24 · current as of 2026-07-05)
 
 datadex's job **right now** is two things:
 
@@ -18,6 +18,17 @@ datadex's job **right now** is two things:
 
 **Ontology Actions / write-backs are deferred.** The AI *reads and reasons*; it does not
 yet write back to your systems. Every diagram below reflects that read-only scope.
+
+**What's landed since 2026-06-24 (folded into the diagrams below):**
+
+- **`ontology.answer`** — the cited, ground-or-abstain synthesis surface (ADR 0029's "context.answer") is **built and live**; the first proposed read-side gap is no longer proposed.
+- **Brownfield in-place adoption** (`generate_ontology_from_source`) + **the Measure** (governed aggregates / rates over certified Objects, multi-hop Link paths) deepen how the model is earned.
+- **Definition versioning** (ADR 0032) — every Object / Link / Property is a definition in a **content-addressed ledger** with semantic diff, revert, and certification pinned to a content hash.
+- **The LLM is a pluggable seam** (ADR 0026): OpenAI (default `gpt-5.4-mini`) · Gemini · Groq / gpt-oss · DeepSeek, and it can point at a **self-hosted OpenAI-compatible endpoint** for residency-bound / egress-blocked deployments.
+- **Ships self-hosted as "Ontos"** — hardened (Nuitka, no Python source), cosign-signed, Ed25519 license-gated OCI images the customer runs **inside their own network, air-gappable**. New connector: **BigQuery** (source + destination).
+- **Learning loop + specialized agent modes** (ADR 0031): a durable hint bank feeds governed flows and escalates when stuck; modeling turns route to a stronger model over one governed substrate.
+
+The MCP surface is now **102 governed tools**. Scope is **unchanged**: read-only, evidence-built, human-certified, agent-only.
 
 ---
 
@@ -141,8 +152,8 @@ flowchart TB
     direction TB
     surf["Surfaces<br/>Web console · AI chat · MCP gateway"]:::container
     agent["AI agent<br/>builds · operates · self-heals"]:::container
-    ctx["Context layer — the company brain<br/>a context packet per business object"]:::container
-    onto["Semantic model / ontology<br/>Objects · Properties · Links · certify + confidence"]:::container
+    ctx["Context layer — the company brain<br/>context packet per Object + cited answers (ontology.answer)"]:::container
+    onto["Semantic model / ontology<br/>Objects · Properties · Links · Measures · certify + confidence<br/>versioned in a content-addressed ledger (ADR 0032)"]:::container
     ev["Evidence & metadata<br/>catalog · profiling · lineage · quality · audit"]:::container
     plat["Data-engineering platform<br/>tasks · pipelines (DAG) · runs · promotion"]:::container
     surf --> agent --> ctx --> onto --> ev --> plat
@@ -151,8 +162,8 @@ flowchart TB
     sec["Secure agent (worker pool)<br/>extract · load · transform · quality"]:::container
   end
   store[("Metadata store<br/>PostgreSQL (encrypted)")]:::store
-  client[("Client systems<br/>Oracle · SQL Server · Snowflake · Databricks · files")]:::external
-  llm["LLM API (Claude)"]:::external
+  client[("Client systems<br/>Oracle · SQL Server · Postgres · BigQuery · files")]:::external
+  llm["LLM provider — pluggable seam (ADR 0026)<br/>OpenAI · Gemini · Groq/gpt-oss · DeepSeek · self-hosted"]:::external
   op --> surf
   ai --> surf
   agent -->|"drafts · chat · reasoning"| llm
@@ -167,9 +178,15 @@ flowchart TB
   classDef store fill:#1168bd,stroke:#0b4884,color:#fff;
   classDef external fill:#8a8a8a,stroke:#5f5f5f,color:#fff;
 ```
-> Reads top-to-bottom: platform earns evidence → evidence builds the model → model becomes the brain → **AI reads grounded context**. The control plane sees only metadata. *(Governed write-back Actions are deferred.)*
+> Reads top-to-bottom: platform earns evidence → evidence builds the model → model becomes the brain → **AI reads grounded context and gets cited answers** (`ontology.answer`). The control plane sees only metadata; the LLM is a provider-pluggable seam. *(Governed write-back Actions are deferred.)*
 
 ## 5 · Deployment topology (data residency)
+
+datadex runs in **two shapes**, same code. **5a — hosted (SaaS):** the control plane is
+managed; only the secure agent sits in your network. **5b — self-hosted ("Ontos"):** the
+*entire* platform runs inside your network and can be **fully air-gapped**.
+
+**5a — hosted (SaaS): metadata-only control plane**
 
 ```mermaid
 flowchart TB
@@ -179,7 +196,7 @@ flowchart TB
   subgraph customer["Customer environment — your network / cloud"]
     direction TB
     sec["Secure agent (worker pool)<br/>the only tier that touches bulk data"]:::container
-    client[("Client systems<br/>Oracle · SQL Server · Snowflake · Databricks · files")]:::external
+    client[("Client systems<br/>Oracle · SQL Server · Postgres · BigQuery · files")]:::external
     sec ==>|"extract · load · transform (native drivers)"| client
   end
 
@@ -194,7 +211,7 @@ flowchart TB
     api --> store
   end
 
-  llm["LLM provider (external)<br/>provider-pluggable seam"]:::external
+  llm["LLM provider (external)<br/>provider-pluggable seam (ADR 0026)"]:::external
 
   op --> web
   ai --> mcp
@@ -210,26 +227,74 @@ flowchart TB
 ```
 > **Bulk client data never leaves your environment** — only the secure agent reads it. The agent reaches **out** to the control plane (HTTPS outbound; no inbound holes in your firewall). The control plane holds metadata + encrypted secrets; the LLM sees prompts only.
 
+**5b — self-hosted ("Ontos"): the whole platform inside your network, air-gappable**
+
+```mermaid
+flowchart TB
+  op[Operator]:::person
+  ai["AI client (MCP)"]:::person
+
+  subgraph supply["Software supply chain (one-time, verifiable offline)"]
+    direction TB
+    ghcr["GHCR public images<br/>ghcr.io/ontos-research/ontos/{control-plane, secure-agent}"]:::external
+    harden["Hardened: Nuitka native .so — no Python source ships"]:::gate
+    sign["cosign-signed → customer runs cosign verify (anonymous)"]:::gate
+    lic["Ed25519 license gate — free to pull, license to RUN (offline-verified)"]:::gate
+    ghcr --> harden --> sign --> lic
+  end
+
+  subgraph customer["Customer environment — ALL tiers on an internal Linux host"]
+    direction TB
+    cp["Control plane (self-hosted)<br/>API + operator console + MCP gateway<br/>+ bundled PostgreSQL (encrypted secrets)"]:::container
+    sec["Secure agent (worker pool)<br/>the only tier that touches bulk data"]:::container
+    client[("Client systems<br/>Oracle · SQL Server · Postgres · BigQuery · files")]:::external
+    localllm["(optional) self-hosted LLM endpoint<br/>OpenAI-compatible — prompts never leave either"]:::container
+    cp -->|"dispatch work (in-network HTTPS)"| sec
+    sec ==>|"extract · load · transform"| client
+    cp -.->|"drafts · chat · reasoning (if local inference)"| localllm
+  end
+
+  extllm["(optional) external LLM provider<br/>only if egress is allowed"]:::external
+
+  op --> cp
+  ai --> cp
+  lic ==>|"boot only with a valid license"| cp
+  cp -.->|"if egress allowed: bounded prompts"| extllm
+
+  style supply fill:#eef9ef,stroke:#1b5e20,color:#1b5e20
+  style customer fill:#fbf2e9,stroke:#cc6600,stroke-dasharray:5 5,color:#cc6600
+  classDef person fill:#08427b,stroke:#052e56,color:#fff;
+  classDef container fill:#1168bd,stroke:#0b4884,color:#fff;
+  classDef gate fill:#e8a33d,stroke:#b97e22,color:#2b2b2b;
+  classDef external fill:#8a8a8a,stroke:#5f5f5f,color:#fff;
+```
+> The self-host distribution ships as **Ontos**: two OCI images (control plane + secure agent) pulled from GHCR, **Nuitka-hardened** (no Python source), **cosign-signed** (verify anonymously), and gated by an **offline Ed25519 license** — free to download, licensed to run (the green band is the one-time, offline-verifiable supply chain). The customer runs *everything* on an internal host; with the LLM seam pointed at a **self-hosted OpenAI-compatible endpoint**, the deployment is **fully air-gapped — neither bulk data nor prompts leave the network**. "Ontos" is a distribution codename; the product is datadex. (Full runbook: `docs/distribution-and-licensing.md`.)
+
 ## 6 · Semantic-model shape (the brain, made concrete)
 
 ```mermaid
 flowchart LR
-  ev["Evidence behind every element<br/>joins · column lineage · profiling · usage"]:::ev
+  ev["Evidence behind every element<br/>joins · column lineage · profiling · usage · source SQL"]:::ev
   subgraph model["Semantic model (ontology) — earned from evidence, human-certified"]
     direction LR
     member["Member ✔ certified<br/>memberId · name · plan · status"]:::obj
     claim["Claim ✔ certified<br/>claimId · amount · status · serviceDate"]:::obj
     provider["Provider ✔ certified<br/>providerId · name · network"]:::obj
+    measure["Measure: denial rate ✔<br/>governed aggregate over Claim × Member (multi-hop path)"]:::measure
     member -->|"files · link conf 0.95*"| claim
     provider -->|"renders · link conf 0.88*"| claim
+    claim -.->|"deterministic SQL over certified backings"| measure
   end
-  ev ==>|"earns + scores every Object, Link & Property"| model
+  ledger["Content-addressed definition ledger (ADR 0032)<br/>every Object · Link · Property · Measure is versioned<br/>semantic diff · revert · certify pins a content hash"]:::ev
+  ev ==>|"earns + scores every element — greenfield (from a Task) OR brownfield (in-place from a source table)"| model
+  model -.->|"every write captured"| ledger
 
   classDef obj fill:#1168bd,stroke:#0b4884,color:#fff;
+  classDef measure fill:#2e7d32,stroke:#1b5e20,color:#fff;
   classDef ev fill:#e8a33d,stroke:#b97e22,color:#2b2b2b;
   style model fill:#eef4fb,stroke:#0b4884,color:#0b4884
 ```
-> **Objects** (business entities) carry certified **Properties**; **Links** are certified and confidence-scored (governed traversal, ADR 0006/0024). The whole model is *earned* from evidence, not hand-declared. Ontology **Actions / write-backs** (e.g. AdjudicateClaim) are **deferred**. *(confidence numbers illustrative)*
+> **Objects** (business entities) carry certified **Properties**; **Links** are certified and confidence-scored (governed traversal, ADR 0006/0024); a **Measure** is a governed number — SUM/COUNT/AVG/**RATE** over a certified Object, grouped through certified Links (compiled to deterministic SQL, not LLM arithmetic). The model is *earned* from evidence — either **greenfield** (from a pipeline Task) or **brownfield** (`generate_ontology_from_source` adopts an existing table **in place**, no data movement). Every element is a **versioned definition** in a content-addressed ledger (ADR 0032): certification pins a content hash, and breaking drift auto-de-certifies. Ontology **Actions / write-backs** (e.g. AdjudicateClaim) are **deferred**. *(confidence numbers illustrative)*
 
 ## 7 · Context-packet anatomy ("perfect context for AI")
 
@@ -258,14 +323,15 @@ flowchart LR
   classDef ok fill:#2e7d32,stroke:#1b5e20,color:#fff;
   style packet fill:#eef4fb,stroke:#0b4884,color:#0b4884
 ```
-> What "give AI the perfect context" concretely means: a single governed read that hands the agent everything to reason about one business Object — assembled deterministically from existing evidence (built, ADR 0027). **Packet confidence** is the in-flight piece (EO-0). **Action decision-traces** are part of the packet design but inactive while Actions are deferred. `ontology.find_context` does the same from a natural-language query (deterministic ranking, no LLM).
+> What "give AI the perfect context" concretely means: a single governed read that hands the agent everything to reason about one business Object — assembled deterministically from existing evidence (built, ADR 0027). **Packet confidence** is the in-flight piece (EO-0). **Action decision-traces** are part of the packet design but inactive while Actions are deferred. `ontology.find_context` does the same from a natural-language query (deterministic ranking, no LLM); **`ontology.answer`** now turns that query into a **cited, ground-or-abstain answer** over the packet (ADR 0029 Slice 1, **built** — it names the un-modelled concept rather than inventing a number).
 
 ---
 
-## Target state (proposed) — 2026-06-24
+## Target state (proposed) — 2026-06-24 · gap (1) landed 2026-07
 
-> **Proposed, NOT built.** Derived from 2026-06-24 market research (`/last30days` + web; see [ADR 0029](../adr/0029-the-target-state-context-layer-is-hybrid-retrieval-plus-cited-answers-read-only.md)). The market converged on datadex's exact category ("active ontology" + "context layer"); these diagrams show the four read-side gaps to become best-in-class.
-> **Purple = net-new in the target state.** Scope unchanged: read-only (ontology Actions / write-backs stay deferred). Wedge to keep legible on every frame: **evidence-built + human-certified + agent-only**.
+> **Proposed, mostly NOT built.** Derived from 2026-06-24 market research (`/last30days` + web; see [ADR 0029](../adr/0029-the-target-state-context-layer-is-hybrid-retrieval-plus-cited-answers-read-only.md)). The market converged on datadex's exact category ("active ontology" + "context layer"); these diagrams show the four read-side gaps to become best-in-class.
+> **Update:** gap (1) — **`context.answer` cited synthesis — has since LANDED** as the live `ontology.answer` MCP tool (ADR 0029 Slice 1). The remaining three gaps (hybrid vector retrieval, point-in-time as-of, episodic memory) stay proposed. Nodes shown blue are built; **purple = still net-new**.
+> Scope unchanged: read-only (ontology Actions / write-backs stay deferred). Wedge to keep legible on every frame: **evidence-built + human-certified + agent-only**.
 
 ### 8 · Retrieval architecture — current vs proposed
 
@@ -306,7 +372,7 @@ flowchart TB
       vector["Semantic / vector retrieval<br/>over backing tables & docs"]:::proposed
       epis["Episodic memory<br/>past answers & decisions"]:::proposed
     end
-    answer["context.answer<br/>retrieve → graph-expand → answer + MANDATORY citations, as-of date"]:::proposed
+    answer["context.answer — BUILT (ontology.answer)<br/>retrieve → ground-or-abstain → cited answer + as-of date"]:::container
   end
   q --> router
   onto --> gtrav
@@ -379,7 +445,7 @@ flowchart LR
   style packet fill:#eef4fb,stroke:#0b4884,color:#0b4884
 ```
 
-> **The four gaps, sequenced value-first (ADR 0029):** (1) `context.answer` cited synthesis - BUILD, first; (2) hybrid vector retrieval + adaptive router - vector store ADOPT-at-boundary; (3) temporal / as-of packet; (4) episodic / decision memory - where the deferred Action-traces later plug in.
+> **The four gaps, sequenced value-first (ADR 0029):** (1) `context.answer` cited synthesis — ✅ **BUILT** (`ontology.answer`); (2) hybrid vector retrieval + adaptive router — vector store ADOPT-at-boundary; (3) temporal / as-of packet; (4) episodic / decision memory — where the deferred Action-traces later plug in.
 
 ---
 
@@ -403,15 +469,19 @@ flowchart TB
     humanonly["HUMAN-ONLY grants<br/>promotions:approve · production:write_direct<br/>stripped from every service account — no agent/key can hold them"]:::gate
     sec["Secrets encrypted at rest<br/>Fernet whole-blob · k1: versioned · write-only in flight"]:::container
     audit["Append-only audit<br/>every governed action · secrets redacted"]:::container
+    ver["Definition versioning (ADR 0032)<br/>content-addressed ledger · semantic diff · revert<br/>certify pins a content hash — drift auto-de-certifies"]:::container
     store[("Metadata store<br/>Postgres, encrypted")]:::store
     gw --> rbac --> humanonly
     gw --> audit
+    gw --> ver
     rbac --> store
     sec --> store
+    ver --> store
   end
   subgraph cust["Customer environment"]
     worker["Secure agent (worker pool)<br/>token ddx_agent_… stored hashed · rotatable"]:::container
     client[("Client systems")]:::external
+    selfhost["Self-hosted option (Ontos)<br/>hardened (Nuitka, no source) · cosign-signed · Ed25519 license-gated<br/>the whole control plane can run HERE — air-gappable"]:::gate
     worker ==>|"the ONLY path to bulk data"| client
   end
   llm["LLM provider"]:::external
@@ -428,7 +498,7 @@ flowchart TB
   style control fill:#eef4fb,stroke:#0b4884,color:#0b4884
   style cust fill:#fbf2e9,stroke:#cc6600,stroke-dasharray:5 5,color:#cc6600
 ```
-> The trust story in one read: **bulk data never leaves the customer env** (only the secure agent touches it, reaching *out* over HTTPS — no inbound holes); the **control plane is metadata-only**; secrets are **encrypted write-only**; and the two grants that admit logic to production (`promotions:approve`, `production:write_direct`) are **human-only by construction** — stripped from every service account, so no agent or API key can cross them (`store_primitives.py` · `secrets.py` · `store_mixins/agents.py`).
+> The trust story in one read: **bulk data never leaves the customer env** (only the secure agent touches it, reaching *out* over HTTPS — no inbound holes); the **control plane is metadata-only**; secrets are **encrypted write-only**; and the two grants that admit logic to production (`promotions:approve`, `production:write_direct`) are **human-only by construction** — stripped from every service account, so no agent or API key can cross them (`store_primitives.py` · `secrets.py` · `store_mixins/agents.py`). Two additions since: every model change is a **versioned, content-addressed definition** (ADR 0032) — a tamper-evident, revertable history where certification is pinned to a content hash; and the whole platform can be **self-hosted (Ontos)** — hardened, cosign-signed, license-gated, and run **fully air-gapped** so nothing (data *or*, with local inference, prompts) ever leaves.
 
 **10b — proposed (agentic zero-trust target state)**
 
@@ -538,17 +608,26 @@ flowchart LR
     propose["Propose remediation<br/>(error · root-cause · quality · load) → ONE governed fix"]:::container
     detect --> diagnose --> propose
   end
+  subgraph learn["LEARN — durable interaction memory + specialized modes (ADR 0031)"]
+    direction TB
+    hints["Hint bank<br/>capture: certify · correction · failure → inject into build flows"]:::container
+    route["Per-turn model routing<br/>modeling turns → a stronger model; read/gauntlet stay cheap"]:::container
+    esc["Frontier-escalation<br/>stuck run → one-way switch up → outcome becomes a Hint"]:::container
+  end
   human["Human approves<br/>one-click: run.retry · task.update · incident.create"]:::gate
   build ==> operate
   propose -->|"auto = False — invariant"| human
   human -.->|"approved fix applied"| operate
+  learn -.->|"hints injected · model chosen per turn"| build
+  operate -.->|"outcomes become new Hints"| learn
 
   classDef container fill:#1168bd,stroke:#0b4884,color:#fff;
   classDef gate fill:#e8a33d,stroke:#b97e22,color:#2b2b2b;
   style build fill:#eef4fb,stroke:#0b4884,color:#0b4884
   style operate fill:#eef4fb,stroke:#0b4884,color:#0b4884
+  style learn fill:#eef4fb,stroke:#0b4884,color:#0b4884
 ```
-> The agent already does the hard part most "AI data engineer" demos skip: when a gold run fails because silver wrote 0 rows because bronze broke, it walks the lineage DAG to the **earliest** broken producer and proposes the fix *there*, not at the symptom — then stops. `propose_remediation` carries an **`auto = False` invariant**: it presents "here's the fix I propose — approve it," it never self-applies (`codegen.py: diagnose_upstream_root_cause` + `propose_remediation`).
+> The agent already does the hard part most "AI data engineer" demos skip: when a gold run fails because silver wrote 0 rows because bronze broke, it walks the lineage DAG to the **earliest** broken producer and proposes the fix *there*, not at the symptom — then stops. `propose_remediation` carries an **`auto = False` invariant**: it presents "here's the fix I propose — approve it," it never self-applies (`codegen.py: diagnose_upstream_root_cause` + `propose_remediation`). It also **learns**: a durable **hint bank** captures certifications, corrections, and failure diagnoses and injects them into later build flows; a stuck run **escalates** one-way to a stronger model and the outcome becomes a new Hint; and per-turn **model routing** sends modeling turns to a stronger model while cheap read/gauntlet turns stay cheap — all as specialized **modes over one governed substrate**, not N isolated agents (ADR 0031).
 
 **12b — proposed (self-healing target state, wedge intact)**
 

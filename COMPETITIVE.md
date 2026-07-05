@@ -1,4 +1,4 @@
-# datadex — competitive deep dive (2026-06-25)
+# datadex — competitive deep dive (2026-06-25 · updated 2026-07-05)
 
 Where datadex sits in the "context layer / active ontology for AI agents" race — written for a
 **hostile room** (a CDO, a technical buyer, an investor who knows these products). Full candor:
@@ -19,10 +19,11 @@ Two things shifted the 2026 picture and both are priced in below:
 
 datadex is the only one doing all of these **at once**:
 
-- **Evidence-built** — the model is earned from real **joins · column lineage · profiling · usage**, not hand-declared (dbt/Atlan), FDE-hand-modeled (Palantir), or embedding/name-inferred (Illumex).
+- **Evidence-built** — the model is earned from real **joins · column lineage · profiling · usage · source SQL**, not hand-declared (dbt/Atlan), FDE-hand-modeled (Palantir), or embedding/name-inferred (Illumex).
 - **Human-certified** — nothing goes live unreviewed; production gates are human-only by construction. Trustworthy, not pure-LLM auto.
-- **Agent-only & engine-agnostic** — read-only over Oracle · SQL Server · Snowflake · Databricks · files *at once*, via the secure agent. Not locked to one warehouse.
+- **Agent-only & engine-agnostic** — read-only over Oracle · SQL Server · Postgres · BigQuery · files *at once*, via the secure agent. Not locked to one warehouse.
 - **It also builds & operates the data** — ingest · transform · run · quality · self-heal. A real DE platform, not a metadata overlay.
+- **Deploys air-gapped** — the whole platform **self-hosts inside your network** (hardened, cosign-signed, license-gated images); the LLM seam can point at a self-hosted endpoint so **neither bulk data nor prompts leave**. The SaaS-first incumbents structurally can't match on-prem/regulated.
 - **Carries decaying confidence** — reinforcement-aware (EO-0): the model's trust is earned and bleeds toward 0 if usage/evidence stops.
 
 Each *leg* is matchable by someone; the **combination** is the moat.
@@ -89,10 +90,11 @@ Legend: ✅ strong · ◐ partial · ➖ not the focus
 | **Builds & operates pipelines** (a DE platform) | ✅ | ➖ | ✅ | ◐ | ➖ | ➖ | **✅** |
 | Serves a **context packet** to agents over MCP | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | **✅** |
 | **Evidence-driven confidence + drift decay** | ◐ | ◐ | ➖ | ➖ | ◐ | ➖ | **✅** |
+| **Self-hosted / air-gapped / on-prem inference** | ◐ | ➖ | ➖ | ◐ | ➖ | ➖ | **✅** |
 | **Write-back Actions** (kinetic) | ✅ | ➖ | ◐ | ➖ | ➖ | ◐ | **➖ deferred** |
 | **Enterprise maturity / ecosystem / scale** | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | **➖ early** |
 
-**Read the wedge as a row pattern:** no column other than datadex is ✅ on *{auto-built + structural-evidence + human-certified + engine-agnostic + builds-pipelines + confidence/drift}* together. datadex is honestly ➖ on the last two rows — that's the trade.
+**Read the wedge as a row pattern:** no column other than datadex is ✅ on *{auto-built + structural-evidence + human-certified + engine-agnostic + builds-pipelines + confidence/drift + air-gapped self-host}* together. datadex is honestly ➖ on the last two rows (write-back Actions, enterprise maturity) — that's the trade.
 
 ---
 
@@ -139,6 +141,7 @@ None of these break the wedge — but pretending they don't exist does.
 - **"Illumex/Atlan also auto-build a semantic graph — what's different?"** They generate from embeddings/metadata and stay metadata-only. datadex earns Links from **structural evidence** (real joins/lineage/usage), **gates them behind human certification**, and **operates the pipelines** — grounded in how data flows, not how columns are named.
 - **"You're read-only — isn't that a toy?"** Read-only is a deliberate scope choice that makes the trust story airtight (we can't break your systems). It's also where the durable value is right now: a *correct, governed model + perfect read context*. Actions are sequenced after that's nailed.
 - **"What stops a warehouse from just adding this?"** Engine-agnosticism and the evidence+certify loop run counter to their walled-garden economics — they're incentivized to keep data *in*, not to reason over data they don't host.
+- **"Can this run fully in our network / air-gapped, with nothing leaving?"** Yes — datadex self-hosts as hardened, cosign-signed, license-gated images (control plane + secure agent) on an internal Linux host, and the LLM seam can point at a self-hosted OpenAI-compatible endpoint, so **neither bulk data nor prompts leave**. That's the deployment the SaaS-first incumbents (Atlan, Glean, the warehouses' own AI) structurally can't offer — and the wedge for regulated / egress-blocked buyers.
 
 ---
 
